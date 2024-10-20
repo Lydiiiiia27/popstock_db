@@ -1,13 +1,47 @@
 import logging
-from sqlalchemy import create_engine, Index, UniqueConstraint, ForeignKeyConstraint
+from sqlalchemy import create_engine, Index, UniqueConstraint, ForeignKeyConstraint, Column, String
 from sqlalchemy.schema import AddConstraint, CreateIndex
-from create_tables import Base, User, Class, StudentClass, Transaction, db_url
+from sqlalchemy.orm import declarative_base
+from sqlalchemy.engine.url import make_url
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Create the engine
+# Define the database URL
+db_url = "postgresql://postgres:postgres@localhost:5432/postgres"
+
+# Python 3.13 compatible version (commented out):
+# from sqlalchemy.engine.url import make_url
+# url = make_url(db_url)
+# url = url.set(drivername='postgresql+pg8000')
+# engine = create_engine(url)
+
+# Python 3.12 or lower compatible version:
 engine = create_engine(db_url)
+
+# Create a base class for declarative class definitions
+Base = declarative_base()
+
+# Define minimal models for constraint creation
+class User(Base):
+    __tablename__ = 'users'
+    id = Column(String, primary_key=True)
+
+class Class(Base):
+    __tablename__ = 'classes'
+    id = Column(String, primary_key=True)
+    download_code = Column(String)
+
+class StudentClass(Base):
+    __tablename__ = 'student_classes'
+    student_id = Column(String, primary_key=True)
+    class_id = Column(String, primary_key=True)
+
+class Transaction(Base):
+    __tablename__ = 'transactions'
+    id = Column(String, primary_key=True)
+    student_id = Column(String)
+    timestamp = Column(String)
 
 def add_indexes_and_constraints():
     try:
@@ -34,8 +68,7 @@ def add_indexes_and_constraints():
             connection.execute(AddConstraint(unique_download_code))
             logging.info("Added uniqueness constraint on download_code in classes table")
 
-            # Add foreign key constraints (if not already present)
-            # Note: These should already be defined in the model, but we'll add them here for completeness
+            # Add foreign key constraints
             fk_student_classes_student = ForeignKeyConstraint([StudentClass.student_id], [User.id], ondelete='CASCADE')
             fk_student_classes_class = ForeignKeyConstraint([StudentClass.class_id], [Class.id], ondelete='CASCADE')
             fk_transactions_student = ForeignKeyConstraint([Transaction.student_id], [User.id], ondelete='CASCADE')
@@ -53,4 +86,3 @@ if __name__ == '__main__':
     logging.info("Starting to add indexes and constraints")
     add_indexes_and_constraints()
     logging.info("Process completed")
-

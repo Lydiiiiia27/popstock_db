@@ -2,12 +2,16 @@ from sqlalchemy import create_engine, Column, String, Numeric, DateTime, Enum, F
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 from sqlalchemy.sql import func
-from sqlalchemy.engine.url import make_url
 
-# Create the engine first
+# Python 3.13 compatible version (commented out):
+# from sqlalchemy.engine.url import make_url
+# db_url = "postgresql://postgres:postgres@localhost:5432/postgres"
+# url = make_url(db_url)
+# url = url.set(drivername='postgresql+pg8000')
+# engine = create_engine(url)
+
+# Python 3.12 or lower compatible version:
 db_url = "postgresql://postgres:postgres@localhost:5432/postgres"
-url = make_url(db_url)
-url = url.set(query={'connect_timeout': '10'})  # 10 seconds timeout
 engine = create_engine(db_url)
 
 # Create a base class for declarative class definitions

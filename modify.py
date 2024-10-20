@@ -1,13 +1,32 @@
 import logging
 from sqlalchemy import create_engine, inspect, text, Boolean, String, Column
-from sqlalchemy.orm import sessionmaker
-from create_tables import Base, User, db_url
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Create the engine
+# Define the database URL
+db_url = "postgresql://postgres:postgres@localhost:5432/postgres"
+
+# Python 3.13 compatible version (commented out):
+# from sqlalchemy.engine.url import make_url
+# url = make_url(db_url)
+# url = url.set(drivername='postgresql+pg8000')
+# engine = create_engine(url)
+
+# Python 3.12 or lower compatible version:
 engine = create_engine(db_url)
+
+# Create a base class for declarative class definitions
+Base = declarative_base()
+
+# Define User model
+class User(Base):
+    __tablename__ = 'users'
+    __table_args__ = {'extend_existing': True}
+
+    id = Column(String, primary_key=True)
+    # Add other columns as needed
 
 def modify_users_table():
     try:
@@ -28,7 +47,6 @@ def modify_users_table():
             else:
                 logging.info("last_initial column already exists in users table")
 
-            # Add first_name column regardless of firstName
             if 'first_name' not in existing_columns:
                 connection.execute(text("ALTER TABLE users ADD COLUMN first_name VARCHAR(255)"))
                 logging.info("Added first_name column to users table")
@@ -41,7 +59,6 @@ def modify_users_table():
         logging.error(f"Error modifying users table: {error}")
 
 def update_user_model():
-    # Update the User model to reflect the changes
     if not hasattr(User, 'is_teacher'):
         User.is_teacher = Column(Boolean, default=False, nullable=False)
         logging.info("Added is_teacher attribute to User model")
@@ -61,13 +78,11 @@ if __name__ == '__main__':
     modify_users_table()
     update_user_model()
     
-    # Create a session and commit the transaction
     Session = sessionmaker(bind=engine)
     with Session() as session:
         session.commit()
     logging.info("Session committed")
     
-    # Inspect the updated table
     inspector = inspect(engine)
     columns = inspector.get_columns('users')
     logging.info("Updated users table columns:")

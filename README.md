@@ -1,110 +1,83 @@
-# Database Table Creation, Modification, and Constraint Scripts
+# PopStock Database Management
 
-## Author
-Lydia
+This project contains scripts for managing and modifying the PopStock database schema.
 
-## Description
-This project contains three Python scripts:
-1. `create_tables.py`: Creates database tables for a popstock teacher website using SQLAlchemy ORM.
-2. `modify.py`: Modifies the existing `users` table to add new columns and update the User model.
-3. `constraints.py`: Adds indexes and constraints to the database tables.
+## Requirements
 
-All scripts connect to a local PostgreSQL database and work with the necessary tables based on defined models.
+- Python 3.12 or lower (3.13 support is commented out but available)
+- PostgreSQL database
 
-## Components
-### create_tables.py
-1. Database Connection Setup
-2. Model Definitions
-   - User
-   - Teacher
-   - Class
-   - StudentClass
-   - Transaction
-3. Table Creation Function
-4. Database Inspection Function
-5. Main Execution Block
+## Installation
 
-### modify.py
-1. Database Connection Setup
-2. User Table Modification Function
-3. User Model Update Function
-4. Main Execution Block
+1. Create a virtual environment:
+   ```
+   python -m venv .venv
+   ```
 
-### constraints.py
-1. Database Connection Setup
-2. Table Existence Check and Creation Function
-3. Index and Constraint Addition Function
-4. Main Execution Block
+2. Activate the virtual environment:
+   - On Windows:
+     ```
+     .venv\Scripts\activate
+     ```
+   - On macOS and Linux:
+     ```
+     source .venv/bin/activate
+     ```
 
-## Prerequisites
-- Python 3.x
-- SQLAlchemy
-- PostgreSQL
-
-## Database Configuration
-All scripts are configured to connect to a local PostgreSQL database with the following details:
-- Host: localhost
-- Port: 5432
-- Database: postgres
-- Username: postgres
-- Password: postgres
-
-Ensure your local PostgreSQL instance is running and accessible with these credentials.
-
-## Usage
-1. Ensure you have the required dependencies installed:
+3. Install the required packages:
    ```
    pip install sqlalchemy psycopg2-binary
    ```
-2. Run the create_tables.py script:
+
+## Configuration
+
+Important: Update the `db_url` in each script (`create_tables.py`, `modify.py`, and `constraints.py`) to match your PostgreSQL database configuration:
+
+```python
+db_url = "postgresql://username:password@host:port/database_name"
+```
+
+Make sure to replace `username`, `password`, `host`, `port`, and `database_name` with your actual PostgreSQL connection details.
+
+## Usage
+
+1. Create tables:
    ```
    python create_tables.py
    ```
-3. Run the modify.py script:
+
+2. Modify users table:
    ```
    python modify.py
    ```
-4. Run the constraints.py script:
+
+3. Add constraints and indexes:
    ```
    python constraints.py
    ```
 
-## Functionality
-### create_tables.py
-- Creates the defined tables in your local PostgreSQL database.
-- Skips creating the 'users' table, assuming it already exists.
-- Inspects the database and prints out the structure of all tables, including columns and foreign key relationships.
+## File Descriptions
 
-### modify.py
-- Modifies the existing 'users' table to add new columns:
-  - `is_teacher` (BOOLEAN)
-  - `last_initial` (VARCHAR(1))
-  - `first_name` (VARCHAR(255))
-- Updates the User model to reflect these changes.
-- Logs the modification process and the updated table structure.
+- `create_tables.py`: Creates the initial database schema.
+- `modify.py`: Adds new columns to the users table.
+- `constraints.py`: Adds indexes and constraints to the database.
 
-### constraints.py
-- Checks if required tables exist and creates them if necessary.
-- Adds the following indexes:
-  - `download_code` in the `classes` table
-  - `student_id` and `class_id` in the `student_classes` table
-  - `timestamp` in the `transactions` table
-- Adds a uniqueness constraint on `download_code` in the `classes` table
-- Adds foreign key constraints for referential integrity
-- Logs the entire process of adding indexes and constraints
+## Notes
 
-## Note
-- Make sure your local PostgreSQL database is running before executing the scripts.
-- The scripts use a 10-second connection timeout.
-- If you encounter any issues, check your database credentials and ensure PostgreSQL is running and accessible.
+- The scripts are currently set up for Python 3.12 and lower.
+- For Python 3.13 support, uncomment the relevant sections in each file and install `pg8000` instead of `psycopg2-binary`:
+  ```
+  pip install pg8000
+  ```
 
 ## Troubleshooting
-If you encounter any errors, they will be printed to the console. Common issues might include:
-- Database connection problems
-- Insufficient permissions
-- Conflicting table names or column names
 
-For any persistent issues, please check your PostgreSQL configuration and ensure you have the necessary permissions to create and modify tables in the specified database.
+If you encounter any issues:
+1. Ensure your PostgreSQL server is running and accessible.
+2. Double-check that the database URL in each script matches your PostgreSQL setup.
+3. Verify that you have the necessary permissions to modify the database.
 
-## Logging
-The `modify.py` and `constraints.py` scripts include logging functionality. You can find detailed logs of the modification and constraint addition processes in the console output when running these scripts.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details.
